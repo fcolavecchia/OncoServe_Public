@@ -32,7 +32,7 @@ class DensityConfig(Config):
         return density_labels[pred]
 
     ONCONET_CONFIG = {
-        'cuda': False,
+        'cuda': True,
         'img_mean': [7662.53827604],
         'img_std': [12604.0682836],
         'img_size': [256,256],
