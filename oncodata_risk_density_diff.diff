@@ -1,0 +1,89 @@
+Binary files oncodata/__pycache__/__init__.cpython-311.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/__pycache__/__init__.cpython-311.pyc differ
+Binary files oncodata/__pycache__/__init__.cpython-36.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/__pycache__/__init__.cpython-36.pyc differ
+diff -r oncodata/dicom_metadata/get_dicom_metadata.py /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_metadata/get_dicom_metadata.py
+1c1
+< import dicom
+---
+> import pydicom
+16c16
+<     dicom_data = dicom.read_file(dicom_path)
+---
+>     dicom_data = pydicom.read_file(dicom_path)
+Binary files oncodata/dicom_to_png/__pycache__/__init__.cpython-311.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/__init__.cpython-311.pyc differ
+Binary files oncodata/dicom_to_png/__pycache__/__init__.cpython-36.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/__init__.cpython-36.pyc differ
+Binary files oncodata/dicom_to_png/__pycache__/dicom_to_png.cpython-311.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/dicom_to_png.cpython-311.pyc differ
+Binary files oncodata/dicom_to_png/__pycache__/dicom_to_png.cpython-36.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/dicom_to_png.cpython-36.pyc differ
+Binary files oncodata/dicom_to_png/__pycache__/get_slice_count.cpython-311.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/get_slice_count.cpython-311.pyc differ
+Binary files oncodata/dicom_to_png/__pycache__/get_slice_count.cpython-36.pyc and /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/__pycache__/get_slice_count.cpython-36.pyc differ
+diff -r oncodata/dicom_to_png/dicom_to_png.py /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/dicom_to_png.py
+6c6
+< import dicom
+---
+> import pydicom
+12a13,14
+> DEFAULT_WINDOW_LEVEL = 540
+> DEFAULT_WINDOW_WIDTH = 580
+45c47,48
+<
+---
+>     print(f"{dicom_path} is being checked for selection criteria")
+>     print(f"{os.getcwd()}")
+47c50,51
+<         dicom_data = dicom.read_file(dicom_path)
+---
+>         dicom_data = pydicom.read_file(dicom_path)
+>         print(f"Patient: {dicom_data.PatientID}, Modality: {dicom_data.Modality}, Manufacturer: {dicom_data.Manufacturer}, SeriesDescription: {dicom_data.SeriesDescription}")
+49c53
+<         print(e)
+---
+>         print(f"Exception [is_selected_dicom]: {e}")
+83c87
+< def dicom_to_png_dcmtk(dicom_path, image_path, selection_criteria, skip_existing=True):
+---
+> def dicom_to_png_dcmtk(dicom_path, image_path, selection_criteria={}, skip_existing=True):
+92c96
+<
+---
+>     # print("Converting {} to {}".format(dicom_path, image_path))
+95d98
+<     print('Converting {}'.format(dicom_path))
+96a100
+>     # print(f"Checking if dicom meets selection criteria {is_selected_dicom(dicom_path, selection_criteria)}")
+98,105c102,105
+<     print('Checking for invalid dicom')
+<     print(f"is_selected_dicom(dicom_path, selection_criteria): {is_selected_dicom(dicom_path, selection_criteria)}")
+<     print(f"has_one_slice(dicom_path): {has_one_slice(dicom_path)}")
+<
+<     # if not (is_selected_dicom(dicom_path, selection_criteria) and has_one_slice(dicom_path)):
+<     #     return
+<
+<     print('Converting {}'.format(dicom_path))
+---
+>     if not (is_selected_dicom(dicom_path, selection_criteria)):
+>         return
+>
+>     # print("Creating directory for image")
+111c111,122
+<     Popen(['dcmj2pnm', '+on2', '--min-max-window', dicom_path, image_path]).wait()
+---
+>     dcm_file = pydicom.read_file(dicom_path)
+>     manufacturer = dcm_file.Manufacturer
+>     series = dcm_file.SeriesDescription
+>     if 'GE' in manufacturer:
+>         proc = Popen(['dcmj2pnm', '+on2', '--use-voi-lut', '1', dicom_path, image_path])
+>         # print("the commandline is {}".format(proc.args))
+>         proc.wait()
+>
+>     elif 'C-View' in series:
+>         Popen(['dcmj2pnm', '+on2', '+Ww', DEFAULT_WINDOW_LEVEL, DEFAULT_WINDOW_WIDTH, dicom_path, image_path]).wait()
+>     else:
+>         Popen(['dcmj2pnm', '+on2', '--min-max-window', dicom_path, image_path]).wait()
+diff -r oncodata/dicom_to_png/get_slice_count.py /home/flavioc/Codes/Mammo/risk_container/root/OncoData/oncodata/dicom_to_png/get_slice_count.py
+5c5
+< import dicom
+---
+> import pydicom
+47c47
+<     dicom_data = dicom.read_file(path)
+---
+>     dicom_data = pydicom.read_file(dicom_path)
