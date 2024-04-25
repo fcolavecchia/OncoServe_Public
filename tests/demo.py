@@ -10,7 +10,6 @@ import oncoserve.aggregators.basic as aggregators
 
 DOMAIN = "http://localhost:5003"
 
-
 # python -m unittest tests.test_intecnus_app.Test_Intecnus_App.test_normal_request
 
 class Test_Intecnus_App(unittest.TestCase):
