@@ -8,7 +8,7 @@ import sys
 sys.path.append(dirname(dirname(realpath(__file__))))
 import oncoserve.aggregators.basic as aggregators
 
-DOMAIN = "http://localhost:5001"
+DOMAIN = "http://localhost:5000"
 
 
 # python -m unittest tests.test_intecnus_app.Test_Intecnus_App.test_normal_request
